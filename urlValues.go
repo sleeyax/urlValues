@@ -6,6 +6,7 @@
 package urlValues
 
 import (
+	"slices"
 	"sort"
 	"strings"
 )
@@ -75,7 +76,9 @@ func (v Values) EncodeWithOrder() string {
 
 func (v Values) Add(key, value string) {
 	v[key] = append(v[key], value)
-	v[OrderKey] = append(v[OrderKey], key)
+	if !slices.Contains(v[OrderKey], key) {
+		v[OrderKey] = append(v[OrderKey], key)
+	}
 }
 
 func (v Values) Del(key string) {

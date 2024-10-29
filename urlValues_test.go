@@ -8,39 +8,52 @@ func getValues() Values {
 	values := Values{}
 	values.Add("xyz", "abc")
 	values.Add("abc", "xyz")
+	values.Add("foo", "bar")
+	values.Add("foo", "baa")
+	values.Add("foo", "baz")
 	return values
 }
 
 func TestValues_Encode(t *testing.T) {
 	values := getValues()
 
-	if values.Encode() != "abc=xyz&xyz=abc" {
-		t.FailNow()
+	encoded := values.Encode()
+
+	if encoded != "abc=xyz&foo=bar&foo=baa&foo=baz&xyz=abc" {
+		t.Fatalf("failed to encode values. got: %s", encoded)
 	}
 
 	values.Del("xyz")
 
-	if values.EncodeWithOrder() != "abc=xyz" {
-		t.Fatalf("failed to delete item")
+	encoded = values.Encode()
+
+	if encoded != "abc=xyz&foo=bar&foo=baa&foo=baz" {
+		t.Fatalf("failed to delete item. got: %s", encoded)
 	}
 }
 
 func TestValues_EncodeWithOrder(t *testing.T) {
 	values := getValues()
 
-	if values.EncodeWithOrder() != "xyz=abc&abc=xyz" {
-		t.FailNow()
+	encoded := values.EncodeWithOrder()
+
+	if encoded != "xyz=abc&abc=xyz&foo=bar&foo=baa&foo=baz" {
+		t.Fatalf("failed to encode values with order. got: %s", encoded)
 	}
 
-	values[OrderKey] = []string{"abc", "xyz"}
+	values[OrderKey] = []string{"abc", "xyz", "foo"}
 
-	if values.EncodeWithOrder() != "abc=xyz&xyz=abc" {
-		t.Fatalf("failed to manually rearrange order")
+	encoded = values.EncodeWithOrder()
+
+	if encoded != "abc=xyz&xyz=abc&foo=bar&foo=baa&foo=baz" {
+		t.Fatalf("failed to encode values with new order. got: %s", encoded)
 	}
 
 	values.Del("abc")
 
-	if values.EncodeWithOrder() != "xyz=abc" && len(values[OrderKey]) != 1 {
-		t.Fatalf("failed to fully delete item")
+	encoded = values.EncodeWithOrder()
+
+	if encoded != "xyz=abc&foo=bar&foo=baa&foo=baz" {
+		t.Fatalf("failed to delete item. got: %s", encoded)
 	}
 }
