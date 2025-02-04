@@ -89,7 +89,7 @@ func (v Values) EncodeWithOrderUnescaped() string {
 			}
 			buf.WriteString(k)
 			buf.WriteByte('=')
-			buf.WriteString(QueryEscape(v))
+			buf.WriteString(v)
 		}
 	}
 	return buf.String()
