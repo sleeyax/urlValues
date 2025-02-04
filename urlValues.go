@@ -53,6 +53,7 @@ func (v Values) Encode() string {
 	}
 	return buf.String()
 }
+
 func (v Values) EncodeWithOrder() string {
 	if v == nil {
 		return ""
@@ -67,6 +68,26 @@ func (v Values) EncodeWithOrder() string {
 				buf.WriteByte('&')
 			}
 			buf.WriteString(keyEscaped)
+			buf.WriteByte('=')
+			buf.WriteString(QueryEscape(v))
+		}
+	}
+	return buf.String()
+}
+
+func (v Values) EncodeWithOrderUnescaped() string {
+	if v == nil {
+		return ""
+	}
+	var buf strings.Builder
+	//sort.Strings(keys) sort ruins original order of our strings, so we remove it to keep order
+	for _, k := range v[OrderKey] {
+		vs := v[k]
+		for _, v := range vs {
+			if buf.Len() > 0 {
+				buf.WriteByte('&')
+			}
+			buf.WriteString(k)
 			buf.WriteByte('=')
 			buf.WriteString(QueryEscape(v))
 		}
